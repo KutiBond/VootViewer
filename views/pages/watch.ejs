@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/head'); %>
+  </head>
+  <body>
+    <!-- <% if (user) { %>
+	<p>Hello <%= user.username %></p>
+<% } %> -->
+    <header>
+      <%- include('../partials/header'); %>
+    </header>
+
+<!-- Video.js base CSS -->
+<link
+  href="https://unpkg.com/video.js@7/dist/video-js.min.css"
+  rel="stylesheet"
+/>
+
+<!-- Forest -->
+<link
+  href="https://unpkg.com/@videojs/themes@1/dist/forest/index.css"
+  rel="stylesheet"
+/>
+
+
+  <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+  <!-- <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script> -->
+
+  <video
+    id="player"
+    class="video-js vjs-theme-forest"
+    controls
+    preload="auto"
+    poster="MY_VIDEO_POSTER.jpg"
+  >
+    <source src="<%- m3u8url %>" type='application/x-mpegURL' />
+    <p class="vjs-no-js">
+      To view this video please enable JavaScript, and consider upgrading to a
+      web browser that
+      <a href="https://videojs.com/html5-video-support/" target="_blank"
+        >supports HTML5 video</a
+      >
+    </p>
+  </video>
+
+    
+
+  <script src="https://unpkg.com/video.js@7/dist/video.min.js"></script>
+
+  <link rel="stylesheet" href="https://www.unpkg.com/videojs-share@3.2.1/dist/videojs-share.css">
+  <script src="https://www.unpkg.com/videojs-share@3/dist/videojs-share.min.js"></script>
+
+  <script src="https://www.unpkg.com/@filmgardi/videojs-markers@2/dist/videojs-markers.min.js"></script>
+
+  <link rel="stylesheet" href="https://www.unpkg.com/videojs-http-source-selector@1/dist/videojs-http-source-selector.css">
+  
+    <script src="https://www.unpkg.com/videojs-http-source-selector@1/dist/videojs-http-source-selector.js"></script>
+<script src="https://www.unpkg.com/videojs-contrib-quality-levels@2/dist/videojs-contrib-quality-levels.min.js"></script>
+
+    <script>
+    const options = {
+          plugins: {
+      httpSourceSelector:
+      {
+        default: 'auto'
+      }
+    }
+    }
+    const player = videojs('player', options)
+
+    const shareOptions = {
+  socials: ['fb', 'tw', 'reddit', 'gp', 'messenger', 'linkedin', 'telegram', 'whatsapp', 'viber', 'vk', 'ok', 'mail'],
+ 
+  url: window.location.href,
+  title: 'videojs-share',
+  description: 'video.js share plugin',
+  image: 'https://dummyimage.com/1200x630',
+ 
+  // required for Facebook and Messenger
+  fbAppId: '12345',
+  // optional for Facebook
+  redirectUri: window.location.href + '#close',
+ 
+  // optional for VK
+  isVkParse: true,
+  
+  // optinal embed code
+  embedCode : '<iframe src=\'' + window.location.href + '\' width="560" height="315" frameborder="0" allowfullscreen></iframe>'
+}
+ 
+player.share(shareOptions);
+    player.httpSourceSelector();
+  </script>
+    <footer><%- include('../partials/footer'); %></footer> 
+  </body>
+</html>
