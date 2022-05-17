@@ -118,7 +118,7 @@ app.get('/show/:id', async (req, res) => {
   const showID = req.params.id;
   const seasonsInfo = await getSeasonInfo(showID);
   let page = Number(req.query.p || 1);
-  let showsInfo = []
+  var showsInfo = []
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   seasonsInfo.forEach(async season => {
@@ -131,7 +131,14 @@ app.get('/show/:id', async (req, res) => {
 console.log(apiJSON)
   let episodes = apiJSON['result']
 
-  episodes.forEach(episode => {
+    function callback () { res.render('pages/show', {user: null, episodes: showsInfo, seasons: seasonsInfo})}
+
+var itemsProcessed = 0;
+    
+  episodes.forEach(async (episode, index, array) => {
+        itemsProcessed++;
+
+    
     let telecastDate = episode['telecastDate'].split("")
     telecastDate[4] = '-' + telecastDate[4]
     telecastDate[6] = '-' + telecastDate[6]
@@ -152,12 +159,13 @@ console.log(apiJSON)
       "telecastDate": telecastDate,
       "slug": `${serverUrl}/watch/?url=${episode['slug']}`,
     })
+
+    if(itemsProcessed === array.length) {
+      callback();
+    }
   })
   })
 
-
-  // console.log(showsInfo)
-  res.render('pages/show', { user: false, episodes: showsInfo, seasons: seasonsInfo })
 })
 
 // Proxy Area
