@@ -102,6 +102,7 @@ async function getSeasonInfo(id) {
       "releaseYear": season["releaseYear"],
       "age": season["age"],
       "contentDescriptor": season["contentDescriptor"],
+      "id": season["id"],
     })
   })
 
@@ -115,21 +116,20 @@ app.get('/show/:id', async (req, res) => {
   const serverUrl = req.protocol + '://' + req.get('host')
 
   const showID = req.params.id;
+  const seasonsInfo = await getSeasonInfo(showID);
   let page = Number(req.query.p || 1);
+  let showsInfo = []
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+  seasonsInfo.forEach(async season => {
   const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/series-wise-episode?sort=episode:desc&id
-=${showID}&responseType=common&page=${page}`;
+=${season.id}&responseType=common&page=${page}`;
   console.log(URL)
   // with await
   let apiJSON = await miniget(URL).text();
   apiJSON = JSON.parse(apiJSON)
 console.log(apiJSON)
   let episodes = apiJSON['result']
-  let showsInfo = []
-
-  // Date
-
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   episodes.forEach(episode => {
     let telecastDate = episode['telecastDate'].split("")
@@ -153,10 +153,11 @@ console.log(apiJSON)
       "slug": `${serverUrl}/watch/?url=${episode['slug']}`,
     })
   })
+  })
 
-  console.log(showsInfo)
 
-  res.render('pages/show', { user: false, episodes: showsInfo, seasons: await getSeasonInfo(showID) })
+  // console.log(showsInfo)
+  res.render('pages/show', { user: false, episodes: showsInfo, seasons: seasonsInfo })
 })
 
 // Proxy Area
