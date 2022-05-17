@@ -117,11 +117,13 @@ app.get('/show/:id', async (req, res) => {
   const showID = req.params.id;
   let page = Number(req.query.p || 1);
 
-  const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/series-wise-episode?sort=episode:desc&id=${showID}&responseType=common&page=${page}`;
+  const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/series-wise-episode?sort=episode:desc&id
+=${showID}&responseType=common&page=${page}`;
+  console.log(URL)
   // with await
   let apiJSON = await miniget(URL).text();
   apiJSON = JSON.parse(apiJSON)
-
+console.log(apiJSON)
   let episodes = apiJSON['result']
   let showsInfo = []
 
