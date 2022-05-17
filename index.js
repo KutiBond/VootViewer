@@ -39,15 +39,15 @@ app.get("/", (req, res) => {
     user: null, shows: [{
       title: 'Ramachari',
       image: 'https://v3img.voot.com/v3Storage/assets/ramachari-16x9-1643358199199.jpg',
-      slug: `${serverUrl}/show/329176`
+      slug: `${serverUrl}/show/1267469`
     }, {
       title: 'Geetha',
       image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/geetha-1920x1080-1640962305453.jpg',
-      slug: `${serverUrl}/show/205005`
+      slug: `${serverUrl}/show/887580`
     }, {
       title: 'Kannadathi',
       image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/kannadathi-1920x0180-1640962798731.jpg',
-      slug: `${serverUrl}/show/190934`
+      slug: `${serverUrl}/show/910666`
     }, {
       title: 'Mangala Gowri Maduwe',
       image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/mgm-1920x1080-1640963103325.jpg',
