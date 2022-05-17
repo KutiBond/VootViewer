@@ -58,6 +58,8 @@
     <script src="https://www.unpkg.com/videojs-http-source-selector@1/dist/videojs-http-source-selector.js"></script>
 <script src="https://www.unpkg.com/videojs-contrib-quality-levels@2/dist/videojs-contrib-quality-levels.min.js"></script>
 
+      <script src="https://www.unpkg.com/videojs-hotkeys@0.2.27/videojs.hotkeys.min.js"></script>  
+  
     <script>
     const options = {
           plugins: {
@@ -91,6 +93,12 @@
  
 player.share(shareOptions);
     player.httpSourceSelector();
+
+        player.hotkeys({
+    volumeStep: 0.1,
+    seekStep: 5,
+    enableModifiersForNumbers: false
+  });
   </script>
     <footer><%- include('../partials/footer'); %></footer> 
   </body>
