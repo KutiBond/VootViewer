@@ -15,6 +15,7 @@
     "m3u8stream": "^0.8.6",
     "miniget": "^4.2.2",
     "morgan": "^1.10.0",
+    "node-fetch": "^2.6.7",
     "youtube-dl-exec": "^2.0.11"
   }
 }

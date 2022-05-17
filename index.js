@@ -1,9 +1,9 @@
 const express = require('express');
 const m3u8stream = require('m3u8stream')
-const miniget = require("miniget");
 const youtubedl = require('youtube-dl-exec');
 const morgan = require("morgan");
 const fs = require("fs")
+const fetch = require('node-fetch')
 
 const app = express();
 app.use(morgan('dev'))
@@ -86,8 +86,11 @@ async function getSeasonInfo(id) {
   const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/season-by-show?sort=season%3Adesc&id=${seasonID}&responseType=common`
 
   // with await
-  let apiJSON = await miniget(URL).text();
-  apiJSON = JSON.parse(apiJSON)
+  let apiJSON = await fetch(URL, {
+    method: 'get',
+    headers: { 'Content-Type': 'application/json', 'Content-Version': 'V4' }
+  });
+  apiJSON = await apiJSON.json()
 
   let seasons = apiJSON['result']
   let seasonsInfo = []
@@ -122,48 +125,49 @@ app.get('/show/:id', async (req, res) => {
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
   seasonsInfo.forEach(async season => {
-  const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/series-wise-episode?sort=episode:desc&id
+    const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/series-wise-episode?sort=episode:desc&id
 =${season.id}&responseType=common&page=${page}`;
-  console.log(URL)
-  // with await
-  let apiJSON = await miniget(URL).text();
-  apiJSON = JSON.parse(apiJSON)
-console.log(apiJSON)
-  let episodes = apiJSON['result']
-
-    function callback () { res.render('pages/show', {user: null, episodes: showsInfo, seasons: seasonsInfo})}
-
-var itemsProcessed = 0;
+    console.log(URL)
+    // with await
+    let apiJSON = await fetch(URL);
+    apiJSON = await apiJSON.json();
     
-  episodes.forEach(async (episode, index, array) => {
-        itemsProcessed++;
+    console.log(apiJSON)
+    let episodes = apiJSON['result']
 
-    
-    let telecastDate = episode['telecastDate'].split("")
-    telecastDate[4] = '-' + telecastDate[4]
-    telecastDate[6] = '-' + telecastDate[6]
-    telecastDate = telecastDate.join('')
+    function callback() { res.render('pages/show', { user: null, episodes: showsInfo, seasons: seasonsInfo }) }
 
-    const d = new Date(telecastDate)
-    telecastDate = []
+    var itemsProcessed = 0;
 
-    telecastDate.push(d.getDate())
-    telecastDate.push(months[d.getMonth()])
-    telecastDate.push(d.getFullYear())
+    episodes.forEach(async (episode, index, array) => {
+      itemsProcessed++;
 
-    telecastDate = telecastDate.join(" ")
 
-    showsInfo.push({
-      "title": episode['shortTitle'],
-      "image": episode['seo']['ogImage'],
-      "telecastDate": telecastDate,
-      "slug": `${serverUrl}/watch/?url=${episode['slug']}`,
+      let telecastDate = episode['telecastDate'].split("")
+      telecastDate[4] = '-' + telecastDate[4]
+      telecastDate[6] = '-' + telecastDate[6]
+      telecastDate = telecastDate.join('')
+
+      const d = new Date(telecastDate)
+      telecastDate = []
+
+      telecastDate.push(d.getDate())
+      telecastDate.push(months[d.getMonth()])
+      telecastDate.push(d.getFullYear())
+
+      telecastDate = telecastDate.join(" ")
+
+      showsInfo.push({
+        "title": episode['shortTitle'],
+        "image": episode['seo']['ogImage'],
+        "telecastDate": telecastDate,
+        "slug": `${serverUrl}/watch/?url=${episode['slug']}`,
+      })
+
+      if (itemsProcessed === array.length) {
+        callback();
+      }
     })
-
-    if(itemsProcessed === array.length) {
-      callback();
-    }
-  })
   })
 
 })
