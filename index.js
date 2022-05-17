@@ -32,7 +32,28 @@ app.use(express.static(__dirname + "/public"));
 
 // Home page
 app.get("/", (req, res) => {
-  res.render("pages/index", { user: undefined })
+  // Server URL
+  const serverUrl = req.protocol + '://' + req.get('host')
+
+  res.render("pages/index", {
+    user: null, shows: [{
+      title: 'Ramachari',
+      image: 'https://v3img.voot.com/v3Storage/assets/ramachari-16x9-1643358199199.jpg',
+      slug: `${serverUrl}/show/329176`
+    }, {
+      title: 'Geetha',
+      image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/geetha-1920x1080-1640962305453.jpg',
+      slug: `${serverUrl}/show/205005`
+    }, {
+      title: 'Kannadathi',
+      image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/kannadathi-1920x0180-1640962798731.jpg',
+      slug: `${serverUrl}/show/190934`
+    }, {
+      title: 'Mangala Gowri Maduwe',
+      image: 'https://v3img.voot.com/resizeMedium,w_540,h_303/v3Storage/assets/mgm-1920x1080-1640963103325.jpg',
+      slug: `${serverUrl}/show/100287`
+    }]
+  })
 });
 
 // Search page
@@ -58,8 +79,40 @@ app.get("/search", async (req, res) => {
     }
   }
 });
-app.get('/show/:id/:page', async (req, res) => {
+
+async function getSeasonInfo(id) {
+  const seasonID = id;
+
+  const URL = `https://psapi.voot.com/jio/voot/v1/voot-web/content/generic/season-by-show?sort=season%3Adesc&id=${seasonID}&responseType=common`
+
+  // with await
+  let apiJSON = await miniget(URL).text();
+  apiJSON = JSON.parse(apiJSON)
+
+  let seasons = apiJSON['result']
+  let seasonsInfo = []
+
+  seasons.forEach(season => {
+    seasonsInfo.push({
+      "title": season["fullTitle"],
+      "image": `https://v3img.voot.com/${season["imageUri"]}`,
+      "description": season["fullSynopsis"],
+      "language": season["defaultLanguage"],
+      "genres": season["genres"],
+      "releaseYear": season["releaseYear"],
+      "age": season["age"],
+      "contentDescriptor": season["contentDescriptor"],
+    })
+  })
+
+  return seasonsInfo;
+}
+
+app.get('/show/:id', async (req, res) => {
   if (!req.params.id) return res.redirect("/");
+
+  // Server URL
+  const serverUrl = req.protocol + '://' + req.get('host')
 
   const showID = req.params.id;
   let page = Number(req.query.p || 1);
@@ -69,16 +122,14 @@ app.get('/show/:id/:page', async (req, res) => {
   let apiJSON = await miniget(URL).text();
   apiJSON = JSON.parse(apiJSON)
 
-  let result = apiJSON['result']
+  let episodes = apiJSON['result']
   let showsInfo = []
 
   // Date
 
   const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-  const serverUrl = req.protocol + '://' + req.get('host')
-
-  result.forEach(episode => {
+  episodes.forEach(episode => {
     let telecastDate = episode['telecastDate'].split("")
     telecastDate[4] = '-' + telecastDate[4]
     telecastDate[6] = '-' + telecastDate[6]
@@ -103,7 +154,7 @@ app.get('/show/:id/:page', async (req, res) => {
 
   console.log(showsInfo)
 
-  res.render('pages/show', { user: false, episodes: showsInfo })
+  res.render('pages/show', { user: false, episodes: showsInfo, seasons: await getSeasonInfo(showID) })
 })
 
 // Proxy Area
@@ -129,7 +180,7 @@ app.get("/watch", async (req, res) => {
 
     // res.setHeader("content-type", "application/x-mpegURL");
     console.log(info.formats[info.formats.length - 1].url)
-    return res.render('pages/watch', {user:false, m3u8url: info.formats[info.formats.length - 2].url})
+    return res.render('pages/watch', { user: false, m3u8url: info.formats[info.formats.length - 2].url })
 
   } catch (error) {
     console.log(error.toString())

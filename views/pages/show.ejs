@@ -10,6 +10,12 @@
     <header>
       <%- include('../partials/header'); %>
     </header>
+    <div class="flex flex-row justify-around">
+      <% seasons.forEach(function(season) { %>
+        <div><h1><%- season.title %></h1></div>
+        <div><img src="<%- season.image %>"/></div>
+ <% }); %> 
+    </div>
 <div class="flex flex-wrap flex-row">
 
      <% episodes.forEach(function(episode) { %>
